@@ -31,8 +31,7 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 });
-
-// Login
+//login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
