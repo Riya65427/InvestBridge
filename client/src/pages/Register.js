@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../api/axios'; 
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,44 +14,79 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', formData);
+      await axios.post('/api/auth/register', formData); 
+      toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (err) {
-      alert('Registration failed');
+      console.error(err);
+      toast.error('Registration failed. User might already exist or invalid data.');
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">Sign Up</h2>
-      <form onSubmit={handleSubmit} className="col-md-6 offset-md-3">
-        <div className="form-group mb-3">
-          <label>Name</label>
-          <input type="text" name="name" className="form-control"
-            value={formData.name} onChange={handleChange} required />
-        </div>
-        <div className="form-group mb-3">
-          <label>Email</label>
-          <input type="email" name="email" className="form-control"
-            value={formData.email} onChange={handleChange} required />
-        </div>
-        <div className="form-group mb-3">
-          <label>Password</label>
-          <input type="password" name="password" className="form-control"
-            value={formData.password} onChange={handleChange} required />
-        </div>
-        <div className="form-group mb-3">
-          <label>Role</label>
-          <select name="role" className="form-control" value={formData.role} onChange={handleChange}>
-            <option value="startup">Startup</option>
-            <option value="investor">Investor</option>
-          </select>
-        </div>
-        <button className="btn btn-success w-100">Register</button>
-      </form>
+      <div className="card shadow-lg p-4 mx-auto" style={{ maxWidth: '500px' }}>
+        <h2 className="card-title text-center mb-4">Sign Up</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="name" className="form-label">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              className="form-control"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className="form-control"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              className="form-control"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="role" className="form-label">Role</label>
+            <select
+              id="role"
+              name="role"
+              className="form-select"
+              value={formData.role}
+              onChange={handleChange}
+            >
+              <option value="startup">Startup</option>
+              <option value="investor">Investor</option>
+            </select>
+          </div>
+          <button
+            type="submit"
+            className="btn btn-success w-100"
+          >
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
 export default Register;
-

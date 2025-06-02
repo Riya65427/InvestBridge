@@ -1,81 +1,91 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState } from 'react';
+import axios from '../api/axios'; 
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 const StartupDashboard = () => {
-  const [startups, setStartups] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [investors, setInvestors] = useState([]);
+  const [interestFilter, setInterestFilter] = useState(''); 
+  const [budgetFilter, setBudgetFilter] = useState(''); 
   const navigate = useNavigate();
- const fetchStartups = async () => {
+
+  const fetchInvestors = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/startup/list");
-      if (!response.ok) throw new Error("Failed to fetch startups");
-      const data = await response.json();
-      setStartups(data);
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          interest: interestFilter,
+          budget: budgetFilter
+        }
+      };
+      const res = await axios.get('/api/investors', config);
+      setInvestors(res.data);
     } catch (error) {
-      console.error("Error fetching startups:", error);
+      console.error("Error fetching investors:", error);
+      toast.error("Failed to load investors.");
     }
   };
-const handleDelete = async (startupId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this startup?");
-    if (!confirmDelete) return;
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/startup/${startupId}`, {
-        method: "DELETE",
-      });
+  useEffect(() => {
+    fetchInvestors();
+  }, [interestFilter, budgetFilter]); 
 
-      if (!response.ok) throw new Error("Failed to delete");
-setStartups(startups.filter((startup) => startup._id !== startupId));
-      toast.success("Startup deleted successfully!", { position: "top-right" });
-    } catch (error) {
-      console.error("Error deleting startup:", error);
-      toast.error("Error deleting startup. Try again.", { position: "top-right" });
-    }
+  const handleAddStartup = () => {
+    navigate('/startupform');
   };
-useEffect(() => {
-    fetchStartups();
-  }, []);
 
-  const filteredStartups = startups.filter((startup) =>
-    startup.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-return (
-    <div className="container mt-4">
-      <h3>Welcome Startup Founders & Investors!</h3>
-      <p>Find startups based on your investment interests.</p>
-      <button onClick={() => navigate("/submit-startup")} className="btn btn-primary mb-3">
-        Post your startup idea on InvestBridge
+  return (
+    <div className="container mt-5">
+      <h2 className="mb-4">Welcome Startup!</h2>
+      <h5 className="mb-4">Secure funding for your venture and connect with qualified investors. </h5>
+      <button
+        className="btn btn-primary mb-4"
+        onClick={handleAddStartup}
+      >
+        Add Startup Idea
       </button>
 
-      {/*Search Bar for Investors */}
-      <input
-  type="text"
-  placeholder=" Search by category "
-  className="form-control mb-3 custom-search-bar"
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-/>
-<div>
-        {filteredStartups.length === 0 ? (
-          <p className="text-muted">No startups found in this category.</p>
-        ) : (
-          filteredStartups.map((startup) => (
-            <div key={startup._id} className="card p-3 mt-3 shadow-sm">
-              <h5>{startup.name}</h5>
-              <p><strong>Description:</strong> {startup.description}</p>
-              <p><strong>Budget:</strong> {startup.budget}</p>
-              <p><strong>Category:</strong> {startup.category}</p>
-              <p><strong>Contact Number:</strong> {startup.contactNumber}</p>
-              <p><strong>Email:</strong> {startup.email}</p>
-              <button onClick={() => handleDelete(startup._id)} className="btn btn-danger mt-2">
-                Delete
-              </button>
+      <h4 className="mb-3">Available Investors:</h4>
+      <div className="mb-4 d-flex gap-3"> 
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Filter by Interest"
+          value={interestFilter}
+          onChange={(e) => setInterestFilter(e.target.value)}
+        />
+        <input
+          type="number"
+          className="form-control"
+          placeholder="Max Budget (₹)"
+          value={budgetFilter}
+          onChange={(e) => setBudgetFilter(e.target.value)}
+        />
+      </div>
+
+      <div className="row">
+        {investors.length > 0 ? (
+          investors.map((inv) => (
+            <div key={inv._id} className="col-md-4 mb-4">
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title"><strong>Name:</strong> {inv.user && inv.user.name ? inv.user.name : 'N/A'}</h5>
+                  <ul className="list-group list-group-flush">
+                    <li className="list-group-item"><strong>Budget:</strong> ₹{inv.budget || 'N/A'}</li>
+                    <li className="list-group-item"><strong>Interests:</strong> {inv.interests || 'N/A'}</li>
+                    <li className="list-group-item"><strong>Contact:</strong> {inv.contactInfo || 'N/A'}</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           ))
+        ) : (
+          <p className="text-muted text-center w-100">No investors found matching your criteria.</p>
         )}
       </div>
     </div>
   );
 };
+
 export default StartupDashboard;

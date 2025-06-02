@@ -1,30 +1,53 @@
 import { useEffect, useState } from 'react';
-import API from '../api/axios';
+import axios from '../api/axios'; 
 
 const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        API.get('/admin/users').then(res => setUsers(res.data));
+        const fetchUsers = async () => {
+            try {
+                const token = localStorage.getItem('token'); 
+                const res = await axios.get('/api/admin/users', { 
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUsers(res.data);
+            } catch (error) {
+                console.error("Error fetching users for admin:", error);
+            }
+        };
+        fetchUsers();
     }, []);
 
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">Admin Dashboard</h2>
-            <table className="table-auto w-full">
-                <thead>
-                    <tr><th>Name</th><th>Email</th><th>Role</th></tr>
-                </thead>
-                <tbody>
-                    {users.map(u => (
-                        <tr key={u._id}>
-                            <td>{u.name}</td>
-                            <td>{u.email}</td>
-                            <td>{u.role}</td>
+        <div className="container mt-5">
+            <h2 className="mb-4">Admin Dashboard</h2>
+            <div className="table-responsive">
+                <table className="table table-striped table-hover shadow-sm">
+                    <thead className="table-dark">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {users.length > 0 ? (
+                            users.map(u => (
+                                <tr key={u._id}>
+                                    <td>{u.name}</td>
+                                    <td>{u.email}</td>
+                                    <td>{u.role}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="3" className="text-center text-muted">No users found.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
