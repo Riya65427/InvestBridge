@@ -21,6 +21,21 @@ const Navbar = () => {
           <ul className="navbar-nav ms-auto">
             {user ? (
               <>
+                {user.role === 'startup' && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/startup">Startup Dashboard</Link>
+                  </li>
+                )}
+                {user.role === 'investor' && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/investor">Investor Dashboard</Link>
+                  </li>
+                )}
+                {user.role === 'admin' && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/admin">Admin Dashboard</Link>
+                  </li>
+                )}
                 <li className="nav-item">
                   <Link className="nav-link" to={`/${user.role}/profile`}>My Profile</Link>
                 </li>

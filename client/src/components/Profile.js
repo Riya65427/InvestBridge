@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from '../api/axios'; 
-import { toast } from 'react-toastify'; 
+import axios from '../api/axios';
+import { toast } from 'react-toastify';
+
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
-
   const [editFormData, setEditFormData] = useState({
-    item1: '', 
-    item2: '', 
-    item3: ''  
+    item1: '',
+    item2: '',
+    item3: '' 
   });
   const [userRole, setUserRole] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +35,7 @@ const Profile = () => {
           } else if (user.role === 'startup') {
             res = await axios.get('/api/startups/me', config);
             dataToSet = {
-              item1: res.data.category || '', 
+              item1: res.data.category || '',
               item2: res.data.budget || '',
               item3: res.data.contactInfo || '' 
             };
@@ -55,7 +55,7 @@ const Profile = () => {
       };
       fetchProfile();
     }
-  }, []); 
+  }, []);
 
   const handleEditChange = (e) => {
     setEditFormData({ ...editFormData, [e.target.name]: e.target.value });
@@ -87,7 +87,7 @@ const Profile = () => {
         item2: res.data.budget,
         item3: res.data.contactInfo
       };
-      setProfileData(updatedData); 
+      setProfileData(updatedData);
       setEditFormData(updatedData); 
       setIsEditing(false);
       toast.success('Profile updated successfully!');
@@ -99,64 +99,67 @@ const Profile = () => {
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditFormData(profileData); 
+    setEditFormData(profileData);
   };
 
   if (profileData === null) {
     return (
       <div className="container mt-5 text-center">
-        <p>Loading profile data...</p>
+        <p className="text-muted fs-5">Loading profile data...</p>
       </div>
     );
   }
 
   return (
     <div className="container mt-5">
-      <div className="card shadow-lg p-4 mx-auto" style={{ maxWidth: '600px' }}>
-        <h2 className="card-title text-center mb-4">Your Profile</h2>
+      <div className="card shadow-lg p-4 mx-auto bg-white rounded-3 border-0" style={{ maxWidth: '600px' }}>
+        <h2 className="card-title text-center mb-4 display-5 fw-bold text-primary">Your Profile</h2>
 
         {!isEditing ? (
-          <div>
+          <div className="p-3"> 
             <div className="mb-3">
-              <strong>{userRole === 'investor' ? 'Interests:' : 'Category:'}</strong> {profileData.item1 || 'N/A'}
+              <strong className="text-secondary fs-5">{userRole === 'investor' ? 'Interests:' : 'Category:'}</strong>{' '}
+              <span className="text-dark fs-5">{profileData.item1 || 'N/A'}</span>
             </div>
             <div className="mb-3">
-              <strong>Budget:</strong> ₹{profileData.item2 || 'N/A'}
+              <strong className="text-secondary fs-5">Budget:</strong>{' '}
+              <span className="text-dark fs-5">₹{profileData.item2 ? profileData.item2.toLocaleString() : 'N/A'}</span>
             </div>
             <div className="mb-4">
-              <strong>Contact Info:</strong> {profileData.item3 || 'N/A'}
+              <strong className="text-secondary fs-5">Contact Info:</strong>{' '}
+              <span className="text-dark fs-5">{profileData.item3 || 'N/A'}</span>
             </div>
             <button
               onClick={() => setIsEditing(true)}
-              className="btn btn-primary w-100"
+              className="btn btn-primary btn-lg w-100 shadow-sm" 
             >
               Edit Profile
             </button>
           </div>
         ) : (
-          <div>
-            <h4 className="card-subtitle text-center mb-4">Update Your Profile</h4>
+          <div className="p-3"> 
+            <h4 className="card-subtitle text-center mb-4 h4 text-secondary">Update Your Profile</h4>
             <div className="mb-3">
-              <label htmlFor="item1" className="form-label">
+              <label htmlFor="item1" className="form-label fw-bold">
                 {userRole === 'investor' ? 'Interests' : 'Category'}
               </label>
               <input
                 id="item1"
                 name="item1"
-                className="form-control"
+                className="form-control form-control-lg shadow-sm"
                 placeholder={userRole === 'investor' ? 'e.g., Tech, Real Estate' : 'e.g., FinTech, AI'}
                 value={editFormData.item1}
                 onChange={handleEditChange}
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="item2" className="form-label">
+              <label htmlFor="item2" className="form-label fw-bold">
                 Budget (₹)
               </label>
               <input
                 id="item2"
                 name="item2"
-                className="form-control"
+                className="form-control form-control-lg shadow-sm" 
                 placeholder="e.g., 500000"
                 value={editFormData.item2}
                 onChange={handleEditChange}
@@ -164,28 +167,28 @@ const Profile = () => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="item3" className="form-label">
+              <label htmlFor="item3" className="form-label fw-bold">
                 Contact Info
               </label>
               <input
                 id="item3"
                 name="item3"
-                className="form-control"
+                className="form-control form-control-lg shadow-sm" 
                 placeholder="e.g., phone, email, LinkedIn"
                 value={editFormData.item3}
                 onChange={handleEditChange}
               />
             </div>
-            <div className="d-grid gap-2"> 
+            <div className="d-grid gap-3"> 
               <button
                 onClick={handleUpdate}
-                className="btn btn-success"
+                className="btn btn-success btn-lg shadow-sm" 
               >
                 Save Changes
               </button>
               <button
                 onClick={handleCancelEdit}
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-lg shadow-sm" 
               >
                 Cancel
               </button>
